@@ -10,4 +10,5 @@ edition = "2018"
 toml = "0.5.6"
 tui = "0.11.0"
 termion = "1.5.5"
-rand = "0.7.3" # this is just for tui examples
+dirs = "3.0.1"
+walkdir = "2.3.1"
