@@ -3,6 +3,7 @@ use tui::Frame;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 
 pub struct BasicAppLayout {
+    pub Breadcrumbs: Rect,
     pub Title: Rect,
     pub GroupContents: Rect,
     pub CommandOutput: Rect,
@@ -14,9 +15,10 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
         .direction(Direction::Vertical)
         .constraints(
             [
-                Constraint::Percentage(10),
-                Constraint::Percentage(80),
-                Constraint::Percentage(10),
+                Constraint::Percentage(7),
+                Constraint::Percentage(7),
+                Constraint::Percentage(66),
+                Constraint::Percentage(20),
             ]
                 .as_ref(),
         )
@@ -31,12 +33,13 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
             ]
                 .as_ref(),
         )
-        .split(chunks[1]);
+        .split(chunks[2]);
 
     BasicAppLayout {
-        Title: chunks[0],
+        Breadcrumbs: chunks[0],
+        Title: chunks[1],
         GroupContents: chunks2[0],
         CommandOutput: chunks2[1],
-        ItemDiscription: chunks[2]
+        ItemDiscription: chunks[3]
     }
 }

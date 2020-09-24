@@ -1,4 +1,6 @@
 use std::{error::Error, io};
+use std::borrow::Cow::Borrowed;
+use std::ops::{BitAnd, BitOr};
 
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{
@@ -40,18 +42,27 @@ pub fn show_ui() -> Result<(), Box<dyn Error>> {
         terminal.draw(|f| {
             let app_layout = Layout::create_layout(f);
 
-            let block = Block::default().borders(Borders::BOTTOM);
-            let paragraph = Paragraph::new("asdasd").block(block);
+            let block = Block::default().borders(Borders::BOTTOM | Borders::TOP);
+            let paragraph = Paragraph::new("Breadcrumbs: root > something").block(block);
+            f.render_widget(paragraph, app_layout.Breadcrumbs);
+
+            let block = Block::default().borders(Borders::ALL);
+            let paragraph = Paragraph::new(Span::from("Eddie"))
+                .style(Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .fg(Color::White)
+                    .bg(Color::DarkGray))
+                .block(block);
             f.render_widget(paragraph, app_layout.Title);
 
-            let block = Block::default().title("Block P2").borders(Borders::ALL);
+            let block = Block::default().title("Group items").borders(Borders::ALL);
 
             let items: Vec<_> = stateful_items
                 .items
                 .iter()
                 .map(|i| {
                     let mut lines = vec![Spans::from(*i)];
-                    ListItem::new(lines).style(Style::default().fg(Color::Black).bg(Color::White))
+                    ListItem::new(lines).style(Style::default().fg(Color::White).bg(Color::Blue))
                 }).collect();
 
             let lsst = List::new(items).block(block)
@@ -60,10 +71,10 @@ pub fn show_ui() -> Result<(), Box<dyn Error>> {
                 .highlight_symbol(">>");
             f.render_stateful_widget(lsst, app_layout.GroupContents, &mut stateful_items.state);
 
-            let block = Block::default().title("Block P3").borders(Borders::ALL);
+            let block = Block::default().title("Command outputs").borders(Borders::ALL);
             f.render_widget(block, app_layout.CommandOutput);
 
-            let block = Block::default().title("Block 2").borders(Borders::ALL);
+            let block = Block::default().title("Item description").borders(Borders::ALL);
             f.render_widget(block, app_layout.ItemDiscription);
         })?;
 
