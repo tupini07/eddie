@@ -77,14 +77,21 @@ pub fn show_ui() -> Result<(), Box<dyn Error>> {
                 Key::Char('q') => {
                     break;
                 }
-                Key::Char('a') => {
+                Key::Backspace => {
                     stateful_items.unselect();
                 }
-                Key::Char('s') => {
+                Key::Char('\t') => {
                     stateful_items.next();
                 }
-                Key::Char('w') => {
+                Key::BackTab => {
                     stateful_items.previous();
+                }
+                Key::Char('\n') => {
+                    // this is used to "action" on the selected item
+                }
+                Key::Esc => {
+                    // this can be used to exit context menu like popup for input
+                    // For input example see: https://github.com/fdehau/tui-rs/blob/master/examples/user_input.rs
                 }
                 _ => {}
             },
