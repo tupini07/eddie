@@ -1,2 +1,2 @@
-pub mod config_aggregator;
-mod toml_parser;
+mod config_aggregator;
+pub mod toml_parser;

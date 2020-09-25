@@ -1,21 +1,10 @@
 use toml::Value;
 
+use crate::config_reader::config_aggregator;
+
 pub fn read_config() {
-    let content = r#"
-        ip = '127.0.0.1'
-
-        [nats]
-        name = 'potato'
-
-        [nats.child]
-        name = 'potato child 1'
-
-        [nats.child2]
-        name = 'potato child 2'
-
-        [nats.child.child]
-        name = 'potato child child 1'
-    "#;
+    let toml_dir = config_aggregator::get_proper_config_directory();
+    let content = config_aggregator::get_aggregated_tomls(toml_dir);
 
     let value = content.parse::<Value>().unwrap();
 

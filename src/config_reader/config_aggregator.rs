@@ -1,11 +1,11 @@
 use std::fs;
 use std::fs::read_dir;
+use std::ops::Add;
 use std::path::{Path, PathBuf};
 
 use walkdir::WalkDir;
-use std::ops::Add;
 
-fn get_proper_config_directory() -> PathBuf {
+pub fn get_proper_config_directory() -> PathBuf {
     let home_dir_path = dirs::home_dir().unwrap();
     let home_dir = home_dir_path.to_str().unwrap();
 
@@ -52,8 +52,7 @@ fn read_file_contents(file_path: &PathBuf) -> String {
         )
 }
 
-pub fn get_aggregated_tomls() -> String {
-    let ddir = get_proper_config_directory();
+pub fn get_aggregated_tomls(ddir: PathBuf) -> String {
     let toml_files = get_list_of_toml_files_in_dir(ddir);
 
     toml_files
@@ -63,3 +62,67 @@ pub fn get_aggregated_tomls() -> String {
         .join("\n")
 }
 
+#[cfg(test)]
+mod tests {
+    use std::env;
+
+    use super::*;
+
+    fn populate_tmp_files() -> Vec<PathBuf> {
+        use std::fs::{File, create_dir};
+
+        let folders = vec![
+            "eddie-test",
+            "eddie-test/subf",
+            "eddie-test/subf2",
+            "eddie-test/subf/sub1_2"
+        ];
+
+        for folder in folders {
+            let mut dir = env::temp_dir();
+            dir.push(folder);
+
+            if !dir.exists() {
+                create_dir(dir).unwrap();
+            }
+        }
+
+        let names = vec![
+            "eddie-test/chom.toml",
+            "eddie-test/poto.toml",
+            "eddie-test/qwoto.toml",
+            "eddie-test/subf/dfdsf.toml",
+            "eddie-test/subf2/agwe.toml",
+            "eddie-test/subf/sub1_2/asd.toml"
+        ];
+
+        let mut created_paths = vec![];
+
+        for name in names {
+            let mut dir = env::temp_dir();
+            dir.push(name);
+
+            if !dir.exists() {
+                File::create(&dir).unwrap();
+            }
+
+            created_paths.push(dir);
+        }
+
+        return created_paths;
+    }
+
+    #[test]
+    fn test_find_tomls() {
+        let mut expected = populate_tmp_files();
+        expected.sort();
+
+        let mut dir = env::temp_dir();
+        dir.push("eddie-test");
+
+        let mut got = get_list_of_toml_files_in_dir(dir);
+        got.sort();
+
+        assert_eq!(got, expected);
+    }
+}
