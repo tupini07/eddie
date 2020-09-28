@@ -38,6 +38,8 @@ pub fn show_ui() -> Result<(), Box<dyn Error>> {
         "Item2",
     ]);
 
+    stateful_items.next();
+
     loop {
         terminal.draw(|f| {
             let app_layout = Layout::create_layout(f);

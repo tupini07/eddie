@@ -12,3 +12,7 @@ tui = "0.11.0"
 termion = "1.5.5"
 dirs = "3.0.1"
 walkdir = "2.3.1"
+
+[dev-dependencies]
+rand = "0.7.3"
+pretty_assertions = "0.6.1"

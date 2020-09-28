@@ -65,64 +65,99 @@ pub fn get_aggregated_tomls(ddir: PathBuf) -> String {
 #[cfg(test)]
 mod tests {
     use std::env;
+    use std::fs::File;
+    use std::io::Write;
+
+    use rand::{Rng, thread_rng};
+    use rand::distributions::Alphanumeric;
 
     use super::*;
 
-    fn populate_tmp_files() -> Vec<PathBuf> {
+    fn get_random_string(n: usize) -> String {
+        let mut rng = rand::thread_rng();
+        rng
+            .sample_iter(&Alphanumeric)
+            .take(n)
+            .collect()
+    }
+
+    fn populate_tmp_files() -> (PathBuf, Vec<PathBuf>) {
+        let random_prefix = get_random_string(5);
+
+        let tmp_eddie_name = String::from("eddie-test-") + &random_prefix;
+
+        let mut test_dir = env::temp_dir();
+        test_dir.push(tmp_eddie_name);
+
+        if !test_dir.exists() {
+            create_dir(&test_dir).unwrap();
+        }
+
         use std::fs::{File, create_dir};
 
-        let folders = vec![
-            "eddie-test",
-            "eddie-test/subf",
-            "eddie-test/subf2",
-            "eddie-test/subf/sub1_2"
+        let sub_folders = vec![
+            "",
+            "subf",
+            "subf/sub1_2",
+            "subf2",
         ];
 
-        for folder in folders {
-            let mut dir = env::temp_dir();
-            dir.push(folder);
+        for folder in sub_folders {
+            let mut fd = test_dir.clone();
+            fd.push(folder);
 
-            if !dir.exists() {
-                create_dir(dir).unwrap();
+            if !fd.exists() {
+                create_dir(fd).unwrap();
             }
         }
 
-        let names = vec![
-            "eddie-test/chom.toml",
-            "eddie-test/poto.toml",
-            "eddie-test/qwoto.toml",
-            "eddie-test/subf/dfdsf.toml",
-            "eddie-test/subf2/agwe.toml",
-            "eddie-test/subf/sub1_2/asd.toml"
+        let test_file_names = vec![
+            "chom.toml",
+            "poto.toml",
+            "qwoto.toml",
+            "subf/dfdsf.toml",
+            "subf2/agwe.toml",
+            "subf/sub1_2/asd.toml"
         ];
 
         let mut created_paths = vec![];
 
-        for name in names {
-            let mut dir = env::temp_dir();
-            dir.push(name);
+        for name in test_file_names {
+            let mut fd = test_dir.clone();
+            fd.push(name);
 
-            if !dir.exists() {
-                File::create(&dir).unwrap();
+            if !fd.exists() {
+                File::create(&fd).unwrap();
             }
 
-            created_paths.push(dir);
+            created_paths.push(fd);
         }
 
-        return created_paths;
+        return (test_dir, created_paths);
+    }
+
+    fn write_random_toml_data_to_file(path: PathBuf) {
+        let mut file = File::open(path).unwrap();
+
+        file.write_all("asdasd".as_bytes());
+
+        file.sync_all();
     }
 
     #[test]
     fn test_find_tomls() {
-        let mut expected = populate_tmp_files();
+        let (tests_folder, mut expected) = populate_tmp_files();
         expected.sort();
 
-        let mut dir = env::temp_dir();
-        dir.push("eddie-test");
-
-        let mut got = get_list_of_toml_files_in_dir(dir);
+        let mut got = get_list_of_toml_files_in_dir(tests_folder);
         got.sort();
 
         assert_eq!(got, expected);
+    }
+
+    #[test]
+    fn test_read_appropriate_toml_data() {
+        // TODO write toml contents and test that reading them returns the expected aggregated
+        // content.
     }
 }
