@@ -70,26 +70,26 @@ pub fn read_config() -> AppConfig {
         "ship"
     ];
 
-    dbg!(&value);
+    let top_level_children: Vec<ConfigNode> = root_table
+        .keys()
+        .into_iter()
+        .filter(|&e| !to_skip.contains(&e.as_str()))
+        .filter_map(|e| root_table.get(e))
+        .map(parse_nodes)
+        .collect();
 
-    for k in root_table.keys().collect::<Vec<&String>>() {
-        if to_skip.contains(&k.as_str()) {
-            continue;
-        }
-
-        let item = root_table.get(k).unwrap();
-
-        let ppp = parse_nodes(item);
-        dbg!(&ppp);
-    }
 
     AppConfig {
         eddie_config: EddieConfig {},
         config_tree: ConfigNode {
-            name: "".to_string(),
-            description: "".to_string(),
+            name: "Root config node".to_string(),
+            description: "This is the root node of the configuration tree".to_string(),
             command: "".to_string(),
-            children: None,
+            children: if !top_level_children.is_empty() {
+                Some(top_level_children)
+            } else {
+                None
+            },
         },
     }
 }
