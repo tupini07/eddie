@@ -1,14 +1,16 @@
-mod config_reader;
-mod ui;
-
 #[cfg(test)]
 #[macro_use]
 extern crate pretty_assertions;
 
+use crate::ui::state::UiState;
+
+mod config_reader;
+mod ui;
 
 fn main() {
     let app_config = config_reader::toml_parser::read_config();
-    dbg!(app_config);
+    let mut ui_state = UiState::new();
+    ui_state.set_config_for_node(&app_config.config_tree);
 
-    ui::show_ui().unwrap();
+    ui::show_ui(ui_state).unwrap();
 }

@@ -16,13 +16,15 @@ use tui::widgets::{List, ListItem, Paragraph};
 use util::event::{Event, Events};
 
 use crate::ui::util::StatefulList;
+use crate::ui::state::UiState;
 
 mod Layout;
 
 #[allow(dead_code)]
 mod util;
+pub mod state;
 
-pub fn show_ui() -> Result<(), Box<dyn Error>> {
+pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
@@ -82,7 +84,7 @@ pub fn show_ui() -> Result<(), Box<dyn Error>> {
 
         // this Option is the Index of the selected item
         if let Some(idx) = stateful_items.state.selected() {
-            dbg!(&stateful_items.items.get(idx));
+            // dbg!(&stateful_items.items.get(idx));
         }
 
         match events.next()? {
