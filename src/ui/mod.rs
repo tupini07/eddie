@@ -3,9 +3,7 @@ use std::{error::Error, io};
 use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{
     backend::TermionBackend,
-    layout::{Constraint, Direction},
     Terminal,
-    widgets::{Block, Borders},
 };
 
 use util::event::Events;
