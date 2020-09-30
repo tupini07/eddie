@@ -43,5 +43,5 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
         Event::Tick => {}
     };
 
-    return false;
+    false
 }

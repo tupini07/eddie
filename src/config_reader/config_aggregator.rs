@@ -1,6 +1,4 @@
 use std::fs;
-use std::fs::read_dir;
-use std::ops::Add;
 use std::path::{Path, PathBuf};
 
 use walkdir::WalkDir;
@@ -9,7 +7,7 @@ pub fn get_proper_config_directory() -> PathBuf {
     let home_dir_path = dirs::home_dir().unwrap();
     let home_dir = home_dir_path.to_str().unwrap();
 
-    let mut config_dirs = vec![
+    let config_dirs = vec![
         format!("{}/.config/eddie/", home_dir),
         format!("{}/.eddie/", home_dir),
         "/etc/eddie/".to_string(),
@@ -68,13 +66,13 @@ mod tests {
     use std::fs::File;
     use std::io::Write;
 
-    use rand::{Rng, thread_rng};
+    use rand::Rng;
     use rand::distributions::Alphanumeric;
 
     use super::*;
 
     fn get_random_string(n: usize) -> String {
-        let mut rng = rand::thread_rng();
+        let rng = rand::thread_rng();
         rng
             .sample_iter(&Alphanumeric)
             .take(n)
@@ -133,13 +131,13 @@ mod tests {
             created_paths.push(fd);
         }
 
-        return (test_dir, created_paths);
+        (test_dir, created_paths)
     }
 
     fn write_random_toml_data_to_file(path: PathBuf) {
         let mut file = File::open(path).unwrap();
 
-        file.write_all("asdasd".as_bytes());
+        file.write_all(b"asdasd");
 
         file.sync_all();
     }

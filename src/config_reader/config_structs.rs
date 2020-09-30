@@ -1,5 +1,3 @@
-use toml::value::Table;
-
 #[derive(Debug)]
 pub struct EddieConfig {
     // config for the actual execution of Eddie

@@ -38,7 +38,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
             .items
             .iter()
             .map(|i| {
-                let mut lines = vec![Spans::from(*i)];
+                let lines = vec![Spans::from(*i)];
                 ListItem::new(lines).style(Style::default().fg(Color::White).bg(Color::Blue))
             }).collect();
 

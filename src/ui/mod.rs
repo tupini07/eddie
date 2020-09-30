@@ -1,22 +1,16 @@
 use std::{error::Error, io};
-use std::borrow::Cow::Borrowed;
-use std::ops::{BitAnd, BitOr};
 
-use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
+use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{
     backend::TermionBackend,
     layout::{Constraint, Direction},
     Terminal,
     widgets::{Block, Borders},
 };
-use tui::style::{Color, Modifier, Style};
-use tui::text::{Span, Spans};
-use tui::widgets::{List, ListItem, Paragraph};
 
-use util::event::{Event, Events};
+use util::event::Events;
 
 use crate::ui::state::UiState;
-use crate::ui::util::StatefulList;
 
 #[allow(dead_code)]
 mod util;
@@ -47,7 +41,7 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
         })?;
 
         // this Option is the Index of the selected item
-        if let Some(idx) = state.current_group_items_state.state.selected() {
+        if let Some(_idx) = state.current_group_items_state.state.selected() {
             // dbg!(&stateful_items.items.get(idx));
         }
 
