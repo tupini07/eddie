@@ -17,7 +17,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
             .collect::<Vec<String>>()
             .join(" > ");
         let paragraph = Paragraph::new(flat_bread.as_str()).block(block);
-        frame.render_widget(paragraph, layout.Breadcrumbs);
+        frame.render_widget(paragraph, layout.breadcrumbs);
     }
 
     { // Render title
@@ -28,7 +28,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
                 .fg(Color::White)
                 .bg(Color::DarkGray))
             .block(block);
-        frame.render_widget(paragraph, layout.Title);
+        frame.render_widget(paragraph, layout.title);
     }
 
     { // Render list items
@@ -46,19 +46,19 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
             .style(Style::default().fg(Color::White))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">> ");
-        frame.render_stateful_widget(lsst, layout.GroupContents, &mut state.current_group_items_state.state);
+        frame.render_stateful_widget(lsst, layout.group_contents, &mut state.current_group_items_state.state);
     }
 
     { // render Command output
         let block = Block::default().title("Command outputs").borders(Borders::ALL);
         let paragraph = Paragraph::new(state.current_command_output.as_str()).block(block);
-        frame.render_widget(paragraph, layout.CommandOutput);
+        frame.render_widget(paragraph, layout.command_output);
     }
 
     { // Render Item description
         let block = Block::default().title("Item description").borders(Borders::ALL);
         let paragraph = Paragraph::new(state.current_description.as_str()).block(block);
-        frame.render_widget(paragraph, layout.ItemDiscription);
+        frame.render_widget(paragraph, layout.item_description);
     }
 
 
@@ -71,6 +71,6 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
                    // .bg(Color::DarkGray)
             )
             .block(block);
-        frame.render_widget(paragraph, layout.HelpContent);
+        frame.render_widget(paragraph, layout.help_content);
     }
 }

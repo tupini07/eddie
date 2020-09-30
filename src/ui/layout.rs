@@ -3,12 +3,12 @@ use tui::Frame;
 use tui::layout::{Constraint, Direction, Layout, Rect};
 
 pub struct BasicAppLayout {
-    pub Breadcrumbs: Rect,
-    pub Title: Rect,
-    pub GroupContents: Rect,
-    pub CommandOutput: Rect,
-    pub ItemDiscription: Rect,
-    pub HelpContent: Rect
+    pub breadcrumbs: Rect,
+    pub title: Rect,
+    pub group_contents: Rect,
+    pub command_output: Rect,
+    pub item_description: Rect,
+    pub help_content: Rect
 }
 
 pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
@@ -38,11 +38,11 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
         .split(chunks[2]);
 
     BasicAppLayout {
-        Breadcrumbs: chunks[0],
-        Title: chunks[1],
-        GroupContents: chunks2[0],
-        CommandOutput: chunks2[1],
-        ItemDiscription: chunks[3],
-        HelpContent: chunks[4]
+        breadcrumbs: chunks[0],
+        title: chunks[1],
+        group_contents: chunks2[0],
+        command_output: chunks2[1],
+        item_description: chunks[3],
+        help_content: chunks[4]
     }
 }
