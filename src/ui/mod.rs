@@ -18,7 +18,7 @@ use util::event::{Event, Events};
 use crate::ui::state::UiState;
 use crate::ui::util::StatefulList;
 
-mod Layout;
+mod layout;
 
 #[allow(dead_code)]
 mod util;
@@ -36,7 +36,7 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
 
     loop {
         terminal.draw(|f| {
-            let app_layout = Layout::create_layout(f);
+            let app_layout = layout::create_layout(f);
 
             let block = Block::default().borders(Borders::BOTTOM | Borders::TOP);
             let paragraph = Paragraph::new("Breadcrumbs: root > something").block(block);
