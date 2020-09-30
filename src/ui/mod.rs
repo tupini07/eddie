@@ -64,7 +64,7 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             let lsst = List::new(items).block(block)
                 .style(Style::default().fg(Color::White))
                 .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
-                .highlight_symbol(">>");
+                .highlight_symbol(">> ");
             f.render_stateful_widget(lsst, app_layout.GroupContents, &mut state.current_group_items_state.state);
 
             let block = Block::default().title("Command outputs").borders(Borders::ALL);
