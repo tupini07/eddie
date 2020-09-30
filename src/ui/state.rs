@@ -24,8 +24,6 @@ impl<'a> UiState<'a> {
         }
     }
 
-    // TODO methods move down and move up maintain the breadcrumb stack
-
     pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
         self.current_title = node.name.clone();
         self.current_description = node.description.clone();
@@ -56,6 +54,38 @@ impl<'a> UiState<'a> {
         self.current_group_items_state.next();
     }
 
+    fn get_selected_node(&self) -> Option<&'a ConfigNode> {
+        let selected_i = self.current_group_items_state.state.selected()?;
+        Some(self.current_group_items.get(selected_i)?)
+    }
+
+    pub fn update_description(&mut self) -> Option<()> {
+        let selected_node = self.get_selected_node()?;
+        self.current_description = selected_node.description.clone();
+
+        Some(())
+    }
+
+    // TODO methods move down and move up maintain the breadcrumb stack
+    pub fn enter_selected_node(&mut self) -> Option<()> {
+        let selected_node = self.get_selected_node()?;
+
+        if !selected_node.is_leaf() {
+            self.set_config_for_node(selected_node);
+            self.current_breadcrumbs.push(selected_node); // TODO this clears breadcrumbs for some reason
+        }
+
+        Some(())
+    }
+
+    pub fn exit_current_node(&mut self) -> Option<()> {
+        if self.current_breadcrumbs.len() > 1 {
+            let previous_node = self.current_breadcrumbs.pop()?;
+            self.set_config_for_node(previous_node);
+        }
+
+        Some(())
+    }
 }
 
 

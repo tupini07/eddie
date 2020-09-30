@@ -23,16 +23,20 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
                 return true;
             }
             Key::Backspace => {
-                state.current_group_items_state.unselect();
+                // state.current_group_items_state.unselect();
+                state.exit_current_node();
             }
             Key::Char('\t') => {
                 state.current_group_items_state.next();
+                state.update_description();
             }
             Key::BackTab => {
                 state.current_group_items_state.previous();
+                state.update_description();
             }
             Key::Char('\n') => {
                 // this is used to "action" on the selected item
+                state.enter_selected_node();
             }
             Key::Esc => {
                 // this can be used to exit context menu like popup for input
