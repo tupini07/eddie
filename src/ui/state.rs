@@ -1,11 +1,13 @@
+use core::fmt;
+
 use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
 
-#[derive(Debug)]
 pub struct UiState<'a> {
     pub current_title: String,
     pub current_breadcrumbs: Vec<String>,
-    pub current_group_items: StatefulList<&'a ConfigNode>,
+    pub current_group_items: Vec<&'a ConfigNode>,
+    pub current_group_items_state: StatefulList<&'a str>,
     pub current_command_output: String,
 }
 
@@ -14,7 +16,8 @@ impl<'a> UiState<'a> {
         UiState {
             current_title: "".to_string(),
             current_breadcrumbs: vec![],
-            current_group_items: StatefulList::new(),
+            current_group_items: vec![],
+            current_group_items_state: StatefulList::new(),
             current_command_output: "".to_string(),
         }
     }
@@ -24,13 +27,34 @@ impl<'a> UiState<'a> {
         self.current_breadcrumbs = vec![];
 
         if let Some(children) = &node.children {
-            self.current_group_items = StatefulList::with_items(children
+            self.current_group_items = children.iter().collect();
+
+            self.current_group_items_state = StatefulList::with_items(children
                 .iter()
+                .map(|e| e.name.as_str())
                 .collect());
         } else {
-            self.current_group_items = StatefulList::new()
+            self.current_group_items = vec![];
+            self.current_group_items_state = StatefulList::new();
         }
 
         self.current_command_output = "potato".to_string();
+
+        // finally, always set the first element of the state as selected
+        self.current_group_items_state.next();
+    }
+}
+
+
+impl<'a> fmt::Debug for UiState<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("UiState")
+            .field("current_title", &self.current_title)
+            .field("current_breadcrumbs", &self.current_breadcrumbs)
+            .field("current_group_items", &self.current_group_items)
+            .field("current_command_output", &self.current_command_output)
+            .field("current_selected", &self.current_group_items_state.state.selected())
+            .field("current_state_list", &self.current_group_items_state.items)
+            .finish()
     }
 }

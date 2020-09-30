@@ -15,8 +15,8 @@ use tui::widgets::{List, ListItem, Paragraph};
 
 use util::event::{Event, Events};
 
-use crate::ui::util::StatefulList;
 use crate::ui::state::UiState;
+use crate::ui::util::StatefulList;
 
 mod Layout;
 
@@ -24,7 +24,7 @@ mod Layout;
 mod util;
 pub mod state;
 
-pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
+pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
@@ -33,14 +33,6 @@ pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
     let mut terminal = Terminal::new(backend)?;
 
     let events = Events::new();
-
-    let mut stateful_items = StatefulList::with_items(vec![
-        "Item0",
-        "Item1",
-        "Item2",
-    ]);
-
-    stateful_items.next();
 
     loop {
         terminal.draw(|f| {
@@ -61,7 +53,7 @@ pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
 
             let block = Block::default().title("Group items").borders(Borders::ALL);
 
-            let items: Vec<_> = stateful_items
+            let items: Vec<_> = state.current_group_items_state
                 .items
                 .iter()
                 .map(|i| {
@@ -73,7 +65,7 @@ pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
                 .style(Style::default().fg(Color::White))
                 .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
                 .highlight_symbol(">>");
-            f.render_stateful_widget(lsst, app_layout.GroupContents, &mut stateful_items.state);
+            f.render_stateful_widget(lsst, app_layout.GroupContents, &mut state.current_group_items_state.state);
 
             let block = Block::default().title("Command outputs").borders(Borders::ALL);
             f.render_widget(block, app_layout.CommandOutput);
@@ -83,7 +75,7 @@ pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
         })?;
 
         // this Option is the Index of the selected item
-        if let Some(idx) = stateful_items.state.selected() {
+        if let Some(idx) = state.current_group_items_state.state.selected() {
             // dbg!(&stateful_items.items.get(idx));
         }
 
@@ -93,13 +85,13 @@ pub fn show_ui(state: UiState) -> Result<(), Box<dyn Error>> {
                     break;
                 }
                 Key::Backspace => {
-                    stateful_items.unselect();
+                    state.current_group_items_state.unselect();
                 }
                 Key::Char('\t') => {
-                    stateful_items.next();
+                    state.current_group_items_state.next();
                 }
                 Key::BackTab => {
-                    stateful_items.previous();
+                    state.current_group_items_state.previous();
                 }
                 Key::Char('\n') => {
                     // this is used to "action" on the selected item

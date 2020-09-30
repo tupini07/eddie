@@ -12,5 +12,7 @@ fn main() {
     let mut ui_state = UiState::new();
     ui_state.set_config_for_node(&app_config.config_tree);
 
+    dbg!(&ui_state);
+
     ui::show_ui(ui_state).unwrap();
 }
