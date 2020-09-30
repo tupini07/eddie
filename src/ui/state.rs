@@ -6,7 +6,7 @@ use crate::ui::util::StatefulList;
 pub struct UiState<'a> {
     pub current_title: String,
     pub current_description: String,
-    pub current_breadcrumbs: Vec<String>,
+    pub current_breadcrumbs: Vec<&'a ConfigNode>,
     pub current_group_items: Vec<&'a ConfigNode>,
     pub current_group_items_state: StatefulList<&'a str>,
     pub current_command_output: String,
@@ -23,6 +23,8 @@ impl<'a> UiState<'a> {
             current_command_output: "".to_string(),
         }
     }
+
+    // TODO methods move down and move up maintain the breadcrumb stack
 
     pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
         self.current_title = node.name.clone();
@@ -53,6 +55,7 @@ impl<'a> UiState<'a> {
         // finally, always set the first element of the state as selected
         self.current_group_items_state.next();
     }
+
 }
 
 

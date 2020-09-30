@@ -39,7 +39,13 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             let app_layout = layout::create_layout(f);
 
             let block = Block::default().borders(Borders::BOTTOM | Borders::TOP);
-            let paragraph = Paragraph::new("Breadcrumbs: root > something").block(block);
+            let flat_bread: String = state
+                .current_breadcrumbs
+                .iter()
+                .map(|e| e.name.clone())
+                .collect::<Vec<String>>()
+                .join(" > ");
+            let paragraph = Paragraph::new(flat_bread.as_str()).block(block);
             f.render_widget(paragraph, app_layout.Breadcrumbs);
 
             let block = Block::default().borders(Borders::ALL);
