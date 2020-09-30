@@ -5,6 +5,7 @@ use crate::ui::util::StatefulList;
 
 pub struct UiState<'a> {
     pub current_title: String,
+    pub current_description: String,
     pub current_breadcrumbs: Vec<String>,
     pub current_group_items: Vec<&'a ConfigNode>,
     pub current_group_items_state: StatefulList<&'a str>,
@@ -15,6 +16,7 @@ impl<'a> UiState<'a> {
     pub fn new() -> UiState<'a> {
         UiState {
             current_title: "".to_string(),
+            current_description: "".to_string(),
             current_breadcrumbs: vec![],
             current_group_items: vec![],
             current_group_items_state: StatefulList::new(),
@@ -24,6 +26,8 @@ impl<'a> UiState<'a> {
 
     pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
         self.current_title = node.name.clone();
+        self.current_description = node.description.clone();
+
         self.current_breadcrumbs = vec![];
 
         if let Some(children) = &node.children {
@@ -50,6 +54,7 @@ impl<'a> fmt::Debug for UiState<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("UiState")
             .field("current_title", &self.current_title)
+            .field("current_description", &self.current_description)
             .field("current_breadcrumbs", &self.current_breadcrumbs)
             .field("current_group_items", &self.current_group_items)
             .field("current_command_output", &self.current_command_output)

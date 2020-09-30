@@ -43,7 +43,7 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             f.render_widget(paragraph, app_layout.Breadcrumbs);
 
             let block = Block::default().borders(Borders::ALL);
-            let paragraph = Paragraph::new(Span::from("Eddie"))
+            let paragraph = Paragraph::new(Span::from(state.current_title.as_str()))
                 .style(Style::default()
                     .add_modifier(Modifier::BOLD)
                     .fg(Color::White)
@@ -68,10 +68,12 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             f.render_stateful_widget(lsst, app_layout.GroupContents, &mut state.current_group_items_state.state);
 
             let block = Block::default().title("Command outputs").borders(Borders::ALL);
-            f.render_widget(block, app_layout.CommandOutput);
+            let paragraph = Paragraph::new(state.current_command_output.as_str()).block(block);
+            f.render_widget(paragraph, app_layout.CommandOutput);
 
             let block = Block::default().title("Item description").borders(Borders::ALL);
-            f.render_widget(block, app_layout.ItemDiscription);
+            let paragraph = Paragraph::new(state.current_description.as_str()).block(block);
+            f.render_widget(paragraph, app_layout.ItemDiscription);
         })?;
 
         // this Option is the Index of the selected item

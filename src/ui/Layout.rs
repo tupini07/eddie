@@ -15,9 +15,9 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
         .direction(Direction::Vertical)
         .constraints(
             [
-                Constraint::Percentage(7),
-                Constraint::Percentage(7),
-                Constraint::Percentage(66),
+                Constraint::Percentage(10),
+                Constraint::Percentage(10),
+                Constraint::Percentage(60),
                 Constraint::Percentage(20),
             ]
                 .as_ref(),
