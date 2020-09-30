@@ -23,6 +23,7 @@ mod util;
 pub mod state;
 mod layout;
 mod event_manager;
+mod drawer;
 
 pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
@@ -35,62 +36,14 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     let events = Events::new();
 
     loop {
-        terminal.draw(|f| {
-            let app_layout = layout::create_layout(f);
+        terminal.draw(|frame| {
+            let app_layout = layout::create_layout(frame);
 
-            let block = Block::default().borders(Borders::BOTTOM | Borders::TOP);
-            let flat_bread: String = state
-                .current_breadcrumbs
-                .iter()
-                .map(|e| e.name.clone())
-                .collect::<Vec<String>>()
-                .join(" > ");
-            let paragraph = Paragraph::new(flat_bread.as_str()).block(block);
-            f.render_widget(paragraph, app_layout.Breadcrumbs);
-
-            let block = Block::default().borders(Borders::ALL);
-            let paragraph = Paragraph::new(Span::from(state.current_title.as_str()))
-                .style(Style::default()
-                    .add_modifier(Modifier::BOLD)
-                    .fg(Color::White)
-                    .bg(Color::DarkGray))
-                .block(block);
-            f.render_widget(paragraph, app_layout.Title);
-
-            let block = Block::default().title("Group items").borders(Borders::ALL);
-
-            let items: Vec<_> = state.current_group_items_state
-                .items
-                .iter()
-                .map(|i| {
-                    let mut lines = vec![Spans::from(*i)];
-                    ListItem::new(lines).style(Style::default().fg(Color::White).bg(Color::Blue))
-                }).collect();
-
-            let lsst = List::new(items).block(block)
-                .style(Style::default().fg(Color::White))
-                .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
-                .highlight_symbol(">> ");
-            f.render_stateful_widget(lsst, app_layout.GroupContents, &mut state.current_group_items_state.state);
-
-            let block = Block::default().title("Command outputs").borders(Borders::ALL);
-            let paragraph = Paragraph::new(state.current_command_output.as_str()).block(block);
-            f.render_widget(paragraph, app_layout.CommandOutput);
-
-            let block = Block::default().title("Item description").borders(Borders::ALL);
-            let paragraph = Paragraph::new(state.current_description.as_str()).block(block);
-            f.render_widget(paragraph, app_layout.ItemDiscription);
-
-
-            let block = Block::default().borders(Borders::NONE);
-            let paragraph = Paragraph::new(Span::from("TAB to select next / Shift + TAB to select previous / RETURN to select / BACKSPACE to go back"))
-                .style(Style::default()
-                           .add_modifier(Modifier::BOLD)
-                           .fg(Color::Yellow)
-                       // .bg(Color::DarkGray)
-                )
-                .block(block);
-            f.render_widget(paragraph, app_layout.HelpContent);
+            drawer::draw_tui(
+                frame,
+                &app_layout,
+                &mut state,
+            );
         })?;
 
         // this Option is the Index of the selected item

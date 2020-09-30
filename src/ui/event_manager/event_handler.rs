@@ -1,7 +1,20 @@
+use std::process::Command;
+
 use termion::event::Key;
 
 use crate::ui::state::UiState;
 use crate::ui::util::event::Event;
+
+fn execute_command(command: &str) -> String {
+    let x = Command::new("sh")
+        .arg("-c")
+        .arg(command)
+        .output()
+        .expect("failed to execute process");
+
+    String::from_utf8(x.stdout)
+        .unwrap_or("Couldn't decode command output".to_string())
+}
 
 pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
     match ev {
