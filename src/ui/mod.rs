@@ -18,11 +18,11 @@ use util::event::{Event, Events};
 use crate::ui::state::UiState;
 use crate::ui::util::StatefulList;
 
-mod layout;
-
 #[allow(dead_code)]
 mod util;
 pub mod state;
+mod layout;
+mod event_manager;
 
 pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
@@ -79,9 +79,9 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             let block = Block::default().borders(Borders::NONE);
             let paragraph = Paragraph::new(Span::from("TAB to select next / Shift + TAB to select previous / RETURN to select / BACKSPACE to go back"))
                 .style(Style::default()
-                    .add_modifier(Modifier::BOLD)
-                    .fg(Color::Yellow)
-                    // .bg(Color::DarkGray)
+                           .add_modifier(Modifier::BOLD)
+                           .fg(Color::Yellow)
+                       // .bg(Color::DarkGray)
                 )
                 .block(block);
             f.render_widget(paragraph, app_layout.HelpContent);
@@ -92,30 +92,9 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             // dbg!(&stateful_items.items.get(idx));
         }
 
-        match events.next()? {
-            Event::Input(input) => match input {
-                Key::Char('q') => {
-                    break;
-                }
-                Key::Backspace => {
-                    state.current_group_items_state.unselect();
-                }
-                Key::Char('\t') => {
-                    state.current_group_items_state.next();
-                }
-                Key::BackTab => {
-                    state.current_group_items_state.previous();
-                }
-                Key::Char('\n') => {
-                    // this is used to "action" on the selected item
-                }
-                Key::Esc => {
-                    // this can be used to exit context menu like popup for input
-                    // For input example see: https://github.com/fdehau/tui-rs/blob/master/examples/user_input.rs
-                }
-                _ => {}
-            },
-            Event::Tick => {}
+        let ev = events.next()?;
+        if event_manager::event_handler::handle_event(ev, &mut state) {
+            break;
         }
     }
 
