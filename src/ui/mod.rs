@@ -74,6 +74,17 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
             let block = Block::default().title("Item description").borders(Borders::ALL);
             let paragraph = Paragraph::new(state.current_description.as_str()).block(block);
             f.render_widget(paragraph, app_layout.ItemDiscription);
+
+
+            let block = Block::default().borders(Borders::NONE);
+            let paragraph = Paragraph::new(Span::from("TAB to select next / Shift + TAB to select previous / RETURN to select / BACKSPACE to go back"))
+                .style(Style::default()
+                    .add_modifier(Modifier::BOLD)
+                    .fg(Color::Yellow)
+                    // .bg(Color::DarkGray)
+                )
+                .block(block);
+            f.render_widget(paragraph, app_layout.HelpContent);
         })?;
 
         // this Option is the Index of the selected item

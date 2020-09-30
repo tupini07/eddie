@@ -7,7 +7,8 @@ pub struct BasicAppLayout {
     pub Title: Rect,
     pub GroupContents: Rect,
     pub CommandOutput: Rect,
-    pub ItemDiscription: Rect
+    pub ItemDiscription: Rect,
+    pub HelpContent: Rect
 }
 
 pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
@@ -17,8 +18,9 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
             [
                 Constraint::Percentage(10),
                 Constraint::Percentage(10),
-                Constraint::Percentage(60),
+                Constraint::Percentage(55),
                 Constraint::Percentage(20),
+                Constraint::Percentage(3),
             ]
                 .as_ref(),
         )
@@ -40,6 +42,7 @@ pub fn create_layout<B: Backend>(f: &mut Frame<B>) -> BasicAppLayout {
         Title: chunks[1],
         GroupContents: chunks2[0],
         CommandOutput: chunks2[1],
-        ItemDiscription: chunks[3]
+        ItemDiscription: chunks[3],
+        HelpContent: chunks[4]
     }
 }
