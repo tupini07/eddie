@@ -4,8 +4,8 @@ use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
 
 pub struct UiState<'a> {
-    pub current_title: String,
-    pub current_description: String,
+    pub current_title: &'a str,
+    pub current_description: &'a str,
     pub current_breadcrumbs: Vec<&'a ConfigNode>,
     pub current_group_items: Vec<&'a ConfigNode>,
     pub current_group_items_state: StatefulList<&'a str>,
@@ -15,8 +15,8 @@ pub struct UiState<'a> {
 impl<'a> UiState<'a> {
     pub fn new() -> UiState<'a> {
         UiState {
-            current_title: "".to_string(),
-            current_description: "".to_string(),
+            current_title: "",
+            current_description: "",
             current_breadcrumbs: vec![],
             current_group_items: vec![],
             current_group_items_state: StatefulList::new(),
@@ -25,8 +25,8 @@ impl<'a> UiState<'a> {
     }
 
     pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
-        self.current_title = node.name.clone();
-        self.current_description = node.description.clone();
+        self.current_title = &node.name;
+        self.current_description = &node.description;
 
         self.current_breadcrumbs = vec![];
 
@@ -61,7 +61,7 @@ impl<'a> UiState<'a> {
 
     pub fn update_description(&mut self) -> Option<()> {
         let selected_node = self.get_selected_node()?;
-        self.current_description = selected_node.description.clone();
+        self.current_description = &selected_node.description;
 
         Some(())
     }

@@ -22,7 +22,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
 
     { // Render title
         let block = Block::default().borders(Borders::ALL);
-        let paragraph = Paragraph::new(Span::from(state.current_title.as_str()))
+        let paragraph = Paragraph::new(Span::from(state.current_title))
             .style(Style::default()
                 .add_modifier(Modifier::BOLD)
                 .fg(Color::White)
