@@ -10,9 +10,7 @@ mod ui;
 fn main() {
     let app_config = config_reader::toml_parser::read_config();
 
-    let mut ui_state = UiState::new();
-    ui_state.set_config_for_node(&app_config.config_tree);
-    ui_state.breadcrumbs.push(&app_config.config_tree);
+    let ui_state = UiState::new(&app_config.config_tree);
 
     dbg!(&ui_state);
 

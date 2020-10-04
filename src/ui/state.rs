@@ -2,31 +2,40 @@ use core::fmt;
 
 use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
+use std::borrow::Borrow;
 
 pub struct UiState<'a> {
     pub title: &'a str,
     pub description: &'a str,
     pub breadcrumbs: Vec<&'a ConfigNode>,
-    pub group_items: Vec<&'a ConfigNode>,
     pub group_items_state: StatefulList<&'a str>,
+    pub group_items: Vec<&'a ConfigNode>,
+    pub current_node: &'a ConfigNode,
+    pub root_node: &'a ConfigNode,
     pub command_output: String,
 }
 
 impl<'a> UiState<'a> {
-    pub fn new() -> UiState<'a> {
-        UiState {
+    pub fn new(root_node: &'a ConfigNode) -> UiState<'a> {
+        let mut state = UiState {
             title: "",
             description: "",
-            breadcrumbs: vec![],
+            breadcrumbs: vec![root_node],
+            current_node: root_node,
             group_items: vec![],
             group_items_state: StatefulList::new(),
             command_output: "".to_string(),
-        }
+            root_node: root_node,
+        };
+
+        state.set_config_for_node(root_node);
+        state
     }
 
     pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
         self.title = &node.name;
         self.description = &node.description;
+        self.current_node = node;
 
         if let Some(children) = &node.children {
             self.group_items = children.iter().collect();
@@ -44,7 +53,7 @@ impl<'a> UiState<'a> {
             // finally, always set the first element of the state as selected
             self.group_items_state.next();
         } else {
-            self.group_items = vec![];
+            self.current_node = self.root_node;
             self.group_items_state = StatefulList::new();
         }
 
@@ -63,23 +72,25 @@ impl<'a> UiState<'a> {
         Some(())
     }
 
-    // TODO methods move down and move up maintain the breadcrumb stack
     pub fn enter_selected_node(&mut self) -> Option<()> {
         let selected_node = self.get_selected_node()?;
 
         if !selected_node.is_leaf() {
-            // self.set_config_for_node(selected_node);
-            self.breadcrumbs.push(selected_node); // TODO this clears breadcrumbs for some reason
+            self.breadcrumbs.push(self.current_node);
+            self.set_config_for_node(selected_node);
         }
 
         Some(())
     }
 
     pub fn exit_current_node(&mut self) -> Option<()> {
+        let previous_node;
         if self.breadcrumbs.len() > 1 {
-            let previous_node = self.breadcrumbs.pop()?;
-            self.set_config_for_node(previous_node);
+            previous_node = self.breadcrumbs.pop()?;
+        } else {
+            previous_node = self.breadcrumbs.first()?;
         }
+        self.set_config_for_node(previous_node);
 
         Some(())
     }
@@ -89,13 +100,13 @@ impl<'a> UiState<'a> {
 impl<'a> fmt::Debug for UiState<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("UiState")
-            .field("current_title", &self.title)
-            .field("current_description", &self.description)
-            .field("current_breadcrumbs", &self.breadcrumbs)
-            .field("current_group_items", &self.group_items)
-            .field("current_command_output", &self.command_output)
-            .field("current_selected", &self.group_items_state.state.selected())
-            .field("current_state_list", &self.group_items_state.items)
+            .field("title", &self.title)
+            .field("description", &self.description)
+            .field("breadcrumbs", &self.breadcrumbs)
+            .field("current_node", &self.current_node)
+            .field("command_output", &self.command_output)
+            .field("group_items_state", &self.group_items_state.state.selected())
+            .field("group_items_state_list", &self.group_items_state.items)
             .finish()
     }
 }
