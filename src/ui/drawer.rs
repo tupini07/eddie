@@ -11,18 +11,18 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
     { // render breadcrumbs
         let block = Block::default().borders(Borders::BOTTOM | Borders::TOP);
         let flat_bread: String = state
-            .current_breadcrumbs
+            .breadcrumbs
             .iter()
             .map(|e| e.name.clone())
             .collect::<Vec<String>>()
-            .join(" > ");
+            .join(" / ");
         let paragraph = Paragraph::new(flat_bread.as_str()).block(block);
         frame.render_widget(paragraph, layout.breadcrumbs);
     }
 
     { // Render title
         let block = Block::default().borders(Borders::ALL);
-        let paragraph = Paragraph::new(Span::from(state.current_title))
+        let paragraph = Paragraph::new(Span::from(state.title))
             .style(Style::default()
                 .add_modifier(Modifier::BOLD)
                 .fg(Color::White)
@@ -34,7 +34,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
     { // Render list items
         let block = Block::default().title("Group items").borders(Borders::ALL);
 
-        let items: Vec<_> = state.current_group_items_state
+        let items: Vec<_> = state.group_items_state
             .items
             .iter()
             .map(|i| {
@@ -46,18 +46,18 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
             .style(Style::default().fg(Color::White))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">> ");
-        frame.render_stateful_widget(lsst, layout.group_contents, &mut state.current_group_items_state.state);
+        frame.render_stateful_widget(lsst, layout.group_contents, &mut state.group_items_state.state);
     }
 
     { // render Command output
         let block = Block::default().title("Command outputs").borders(Borders::ALL);
-        let paragraph = Paragraph::new(state.current_command_output.as_str()).block(block);
+        let paragraph = Paragraph::new(state.command_output.as_str()).block(block);
         frame.render_widget(paragraph, layout.command_output);
     }
 
     { // Render Item description
         let block = Block::default().title("Item description").borders(Borders::ALL);
-        let paragraph = Paragraph::new(state.current_description.as_str()).block(block);
+        let paragraph = Paragraph::new(state.description).block(block);
         frame.render_widget(paragraph, layout.item_description);
     }
 

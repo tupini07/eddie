@@ -1,8 +1,8 @@
 use core::fmt;
+use std::borrow::Borrow;
 
 use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
-use std::borrow::Borrow;
 
 pub struct UiState<'a> {
     pub title: &'a str,
@@ -20,7 +20,7 @@ impl<'a> UiState<'a> {
         let mut state = UiState {
             title: "",
             description: "",
-            breadcrumbs: vec![root_node],
+            breadcrumbs: vec![],
             current_node: root_node,
             group_items: vec![],
             group_items_state: StatefulList::new(),
@@ -85,12 +85,10 @@ impl<'a> UiState<'a> {
 
     pub fn exit_current_node(&mut self) -> Option<()> {
         let previous_node;
-        if self.breadcrumbs.len() > 1 {
+        if !self.breadcrumbs.is_empty() {
             previous_node = self.breadcrumbs.pop()?;
-        } else {
-            previous_node = self.breadcrumbs.first()?;
+            self.set_config_for_node(previous_node);
         }
-        self.set_config_for_node(previous_node);
 
         Some(())
     }

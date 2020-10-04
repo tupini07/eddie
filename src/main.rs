@@ -12,7 +12,5 @@ fn main() {
 
     let ui_state = UiState::new(&app_config.config_tree);
 
-    dbg!(&ui_state);
-
     ui::show_ui(ui_state).unwrap();
 }
