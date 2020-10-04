@@ -39,7 +39,7 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
         })?;
 
         // this Option is the Index of the selected item
-        if let Some(_idx) = state.current_group_items_state.state.selected() {
+        if let Some(_idx) = state.group_items_state.state.selected() {
             // dbg!(&stateful_items.items.get(idx));
         }
 

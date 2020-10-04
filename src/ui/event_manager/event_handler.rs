@@ -27,11 +27,11 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
                 state.exit_current_node();
             }
             Key::Char('\t') => {
-                state.current_group_items_state.next();
+                state.group_items_state.next();
                 state.update_description();
             }
             Key::BackTab => {
-                state.current_group_items_state.previous();
+                state.group_items_state.previous();
                 state.update_description();
             }
             Key::Char('\n') => {
