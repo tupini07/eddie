@@ -44,8 +44,11 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
         }
 
         let ev = events.next()?;
-        if event_manager::event_handler::handle_event(ev, &mut state) {
-            break;
+        match event_manager::event_handler::handle_event(ev, &mut state) {
+            None => break,
+            Some(v) => if v {
+                break;
+            }
         }
     }
 

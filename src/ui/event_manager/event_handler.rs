@@ -16,11 +16,11 @@ fn execute_command(command: &str) -> String {
         .unwrap_or("Couldn't decode command output".to_string())
 }
 
-pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
+pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {
     match ev {
         Event::Input(input) => match input {
             Key::Char('q') => {
-                return true;
+                return Some(true);
             }
             Key::Backspace => {
                 // state.current_group_items_state.unselect();
@@ -35,8 +35,13 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
                 state.update_description();
             }
             Key::Char('\n') => {
-                // this is used to "action" on the selected item
-                state.enter_selected_node();
+                let selected_node = state.get_selected_node()?;
+                if selected_node.is_leaf() {
+                    state.command_output = execute_command(&selected_node.command);
+                } else {
+                    // this is used to "action" on the selected item
+                    state.enter_selected_node();
+                }
             }
             Key::Esc => {
                 // this can be used to exit context menu like popup for input
@@ -47,5 +52,5 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> bool {
         Event::Tick => {}
     };
 
-    false
+    Some(false)
 }

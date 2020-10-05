@@ -60,7 +60,7 @@ impl<'a> UiState<'a> {
         self.command_output = "potato".to_string();
     }
 
-    fn get_selected_node(&self) -> Option<&'a ConfigNode> {
+    pub fn get_selected_node(&self) -> Option<&'a ConfigNode> {
         let selected_i = self.group_items_state.state.selected()?;
         Some(self.group_items.get(selected_i)?)
     }
