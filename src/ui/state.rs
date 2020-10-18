@@ -50,8 +50,11 @@ impl<'a> UiState<'a> {
 
             self.group_items_state = StatefulList::with_items(items_for_state);
 
-            // finally, always set the first element of the state as selected
+            // set the first element of the state as selected
             self.group_items_state.next();
+
+            // set description to that of the first element of the group
+            self.update_description();
         } else {
             self.current_node = self.root_node;
             self.group_items_state = StatefulList::new();
