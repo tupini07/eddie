@@ -28,7 +28,10 @@ fn parse_nodes(val: &Value) -> ConfigNode {
     let table = val.as_table().unwrap();
 
     let name = table.get("name").unwrap().as_str().unwrap();
-    let description = table.get("description").unwrap().as_str().unwrap();
+    let description = match table.get("description") {
+        None => "NO DESCRIPTION PROVIDED",
+        Some(e) => e.as_str().unwrap()
+    };
 
     let command = if let Some(command) = table.get("command") {
         command.as_str().unwrap()
