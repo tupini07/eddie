@@ -2,7 +2,7 @@ use tui::backend::Backend;
 use tui::Frame;
 use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
-use tui::widgets::{Block, Borders, List, ListItem, Paragraph};
+use tui::widgets::{Block, Borders, List, ListItem, Paragraph, Wrap};
 
 use crate::ui::layout::BasicAppLayout;
 use crate::ui::state::UiState;
@@ -57,7 +57,7 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
 
     { // Render Item description
         let block = Block::default().title("Item description").borders(Borders::ALL);
-        let paragraph = Paragraph::new(state.description).block(block);
+        let paragraph = Paragraph::new(state.description).wrap(Wrap { trim: true }).block(block);
         frame.render_widget(paragraph, layout.item_description);
     }
 
