@@ -1,21 +1,18 @@
 use std::{error::Error, io};
 
 use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{
-    backend::TermionBackend,
-    Terminal,
-};
+use tui::{backend::TermionBackend, Terminal};
 
 use util::event::Events;
 
 use crate::ui::state::UiState;
 
+mod drawer;
+mod event_manager;
+mod layout;
+pub mod state;
 #[allow(dead_code)]
 mod util;
-pub mod state;
-mod layout;
-mod event_manager;
-mod drawer;
 
 pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
@@ -31,12 +28,14 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
         terminal.draw(|frame| {
             let app_layout = layout::create_layout(frame);
 
-            drawer::draw_tui(
-                frame,
-                &app_layout,
-                &mut state,
-            );
+            drawer::draw_tui(frame, &app_layout, &mut state);
         })?;
+
+        // force redraw if necessary
+        if state.need_redraw {
+            terminal.resize(terminal.size().unwrap());
+            state.need_redraw = false;
+        }
 
         // this Option is the Index of the selected item
         if let Some(_idx) = state.group_items_state.state.selected() {
@@ -46,8 +45,10 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
         let ev = events.next()?;
         match event_manager::event_handler::handle_event(ev, &mut state) {
             None => break,
-            Some(v) => if v {
-                break;
+            Some(v) => {
+                if v {
+                    break;
+                }
             }
         }
     }

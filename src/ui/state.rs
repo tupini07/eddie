@@ -13,6 +13,7 @@ pub struct UiState<'a> {
     pub current_node: &'a ConfigNode,
     pub root_node: &'a ConfigNode,
     pub command_output: String,
+    pub need_redraw: bool,
 }
 
 impl<'a> UiState<'a> {
@@ -26,6 +27,7 @@ impl<'a> UiState<'a> {
             group_items_state: StatefulList::new(),
             command_output: "".to_string(),
             root_node: root_node,
+            need_redraw: false,
         };
 
         state.set_config_for_node(root_node);
@@ -95,7 +97,6 @@ impl<'a> UiState<'a> {
     }
 }
 
-
 impl<'a> fmt::Debug for UiState<'a> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("UiState")
@@ -104,8 +105,12 @@ impl<'a> fmt::Debug for UiState<'a> {
             .field("breadcrumbs", &self.breadcrumbs)
             .field("current_node", &self.current_node)
             .field("command_output", &self.command_output)
-            .field("group_items_state", &self.group_items_state.state.selected())
+            .field(
+                "group_items_state",
+                &self.group_items_state.state.selected(),
+            )
             .field("group_items_state_list", &self.group_items_state.items)
+            .field("need_redraw", &self.need_redraw)
             .finish()
     }
 }

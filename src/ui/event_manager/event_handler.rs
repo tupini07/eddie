@@ -38,6 +38,9 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {
                 let selected_node = state.get_selected_node()?;
                 if selected_node.is_leaf() {
                     state.command_output = execute_command(&selected_node.command);
+
+                    // always triggered a forced redraw after a command is executed
+                    state.need_redraw = true;
                 } else {
                     // this is used to "action" on the selected item
                     state.enter_selected_node();
