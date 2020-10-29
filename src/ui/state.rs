@@ -59,8 +59,6 @@ impl<'a> UiState<'a> {
             self.current_node = self.root_node;
             self.group_items_state = StatefulList::new();
         }
-
-        self.command_output = "potato".to_string();
     }
 
     pub fn get_selected_node(&self) -> Option<&'a ConfigNode> {
