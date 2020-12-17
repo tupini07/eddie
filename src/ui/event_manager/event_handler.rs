@@ -1,5 +1,5 @@
 use std::io::{self, stdin, Error, Read, Write};
-use std::process::{Command, Output, Stdio};
+use std::process::{Command, Stdio};
 
 use termion::event::Key;
 
@@ -29,34 +29,10 @@ fn execute_command(command_node: &ConfigNode) -> String {
         .spawn()
         .expect("failed to execute process");
 
-    let mut output_bytes: Vec<u8> = vec![];
-
-    let stdout = child.stdout.take().unwrap();
-    for byte in stdout.bytes() {
-        let ubyte = byte.unwrap();
-
-        output_bytes.push(ubyte);
+    match child.wait_with_output() {
+        Ok(o) => String::from_utf8(o.stdout).unwrap(),
+        Err(_) => "There was an error while decoding the command's output!".to_string(),
     }
-
-    child.wait().unwrap();
-
-    // let _ = Command::new("sleep")
-    //     .arg("2")
-    //     .output()
-    //     .expect("failed to sleep terminal");
-
-    // let mut s=String::new();
-    // stdin()
-    //     .read_line(&mut s)
-    //     .expect("Did not enter a correct string");
-
-    // let ouput_str = match child.wait_with_output() {
-    //     Ok(o) => String::from_utf8(o.stdout).unwrap(),
-    //     Err(_) => "There was an error while decoding the command's output!".to_string(),
-    // };
-    // return ouput_str;
-
-    return String::from_utf8(output_bytes).unwrap();
 }
 
 pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {

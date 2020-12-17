@@ -1,5 +1,5 @@
 use core::fmt;
-use std::borrow::Borrow;
+
 
 use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
@@ -26,7 +26,7 @@ impl<'a> UiState<'a> {
             group_items: vec![],
             group_items_state: StatefulList::new(),
             command_output: "".to_string(),
-            root_node: root_node,
+            root_node,
             need_redraw: false,
         };
 

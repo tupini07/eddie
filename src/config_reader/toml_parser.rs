@@ -58,7 +58,7 @@ fn parse_nodes(val: &Value) -> ConfigNode {
         name: name.to_string(),
         description: description.to_string(),
         command: command.to_string(),
-        opens_external: opens_external,
+        opens_external,
         children: if parsed_subtables.is_empty() {
             None
         } else {
