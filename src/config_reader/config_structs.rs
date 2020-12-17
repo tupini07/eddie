@@ -10,6 +10,8 @@ pub struct AppConfig {
 }
 
 #[derive(Debug)]
+/// This is a structure which represents a single item in the config tree loaded from the TOML files.
+/// See the [crate::config_reader].
 pub struct ConfigNode {
     pub name: String,
     pub description: String,
@@ -23,7 +25,7 @@ impl ConfigNode {
         self.children.is_none()
     }
 
-    pub fn is_valid(&self) -> bool {
+    pub fn _is_valid(&self) -> bool {
         self.children.is_some() || !self.command.is_empty()
     }
 }
