@@ -1,3 +1,5 @@
+//! Welcome to [Eddie](https://hitchhikers.fandom.com/wiki/Eddie_the_Computer).
+
 #[cfg(test)]
 #[macro_use]
 extern crate pretty_assertions;

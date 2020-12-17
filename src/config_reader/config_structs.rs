@@ -1,12 +1,12 @@
 #[derive(Debug)]
-pub struct EddieConfig {
-    // config for the actual execution of Eddie
-}
-
-#[derive(Debug)]
 pub struct AppConfig {
     pub eddie_config: EddieConfig,
     pub config_tree: ConfigNode,
+}
+
+#[derive(Debug)]
+pub struct EddieConfig {
+    // config for the actual execution of Eddie
 }
 
 #[derive(Debug)]
