@@ -33,7 +33,11 @@ pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
 
         // force redraw if necessary
         if state.need_redraw {
-            terminal.resize(terminal.size().unwrap());
+            // ignore resize error
+            match terminal.resize(terminal.size().unwrap()) {
+                Ok(_) => {} // ignore ok
+                Err(e) => println!("Error while redrawing terminal: {:?}", e),
+            }
             state.need_redraw = false;
         }
 

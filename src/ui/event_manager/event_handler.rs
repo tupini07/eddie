@@ -1,4 +1,3 @@
-use std::io::{self, stdin, Error, Read, Write};
 use std::process::{Command, Stdio};
 
 use termion::event::Key;
@@ -23,7 +22,7 @@ fn execute_command(command_node: &ConfigNode) -> String {
         command.arg("-c").arg(&command_node.command)
     };
 
-    let mut child = command
+    let child = command
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
