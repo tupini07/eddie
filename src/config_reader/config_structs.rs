@@ -15,6 +15,7 @@ pub struct ConfigNode {
     pub description: String,
     pub command: String,
     pub children: Option<Vec<ConfigNode>>,
+    pub opens_external: bool,
 }
 
 impl ConfigNode {

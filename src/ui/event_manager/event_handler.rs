@@ -3,32 +3,31 @@ use std::process::{Command, Output, Stdio};
 
 use termion::event::Key;
 
-use crate::ui::state::UiState;
 use crate::ui::util::event::Event;
+use crate::{config_reader::config_structs::ConfigNode, ui::state::UiState};
 
-fn execute_command(command: &str, output: &mut String) -> String {
-    // // ask for arguments
-    // let _ = Command::new("clear")
-    //     .spawn()
-    //     .expect("failed to clear terminal")
-    //     .wait();
+fn execute_command(command_node: &ConfigNode) -> String {
+    let mut command = Command::new(if command_node.opens_external {
+        "alacritty"
+    } else {
+        "fish"
+    });
 
-    let mut child = Command::new("fish")
-        .arg("-c")
-        .arg(command)
+    if command_node.opens_external {
+        command
+            .arg("--command")
+            .arg("fish")
+            .arg("-c")
+            .arg(&command_node.command)
+    } else {
+        command.arg("-c").arg(&command_node.command)
+    };
+
+    let mut child = command
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
         .expect("failed to execute process");
-
-    // {
-    //     let child_stdin = child.stdin.as_mut().unwrap();
-    //
-    //     let mut s=String::new();
-    //     stdin().read_line(&mut s).expect("Did not enter a correct string");
-    //
-    //     child_stdin.write_all(s.as_bytes()).unwrap();
-    // }
 
     let mut output_bytes: Vec<u8> = vec![];
 
@@ -83,8 +82,7 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {
                 if selected_node.is_leaf() {
                     state.command_output = "".to_string();
 
-                    state.command_output =
-                        execute_command(&selected_node.command, &mut state.command_output);
+                    state.command_output = execute_command(&selected_node);
 
                     // always triggered a forced redraw after a command is executed
                     state.need_redraw = true;
