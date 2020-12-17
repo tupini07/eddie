@@ -1,23 +1,22 @@
 use core::fmt;
 
-
 use crate::config_reader::config_structs::ConfigNode;
 use crate::ui::util::StatefulList;
 
-pub struct UiState<'a> {
-    pub title: &'a str,
-    pub description: &'a str,
-    pub breadcrumbs: Vec<&'a ConfigNode>,
-    pub group_items_state: StatefulList<&'a str>,
-    pub group_items: Vec<&'a ConfigNode>,
-    pub current_node: &'a ConfigNode,
-    pub root_node: &'a ConfigNode,
+pub struct UiState {
+    pub title: &'static str,
+    pub description: &'static str,
+    pub breadcrumbs: Vec<&'static ConfigNode>,
+    pub group_items_state: StatefulList<&'static str>,
+    pub group_items: Vec<&'static ConfigNode>,
+    pub current_node: &'static ConfigNode,
+    pub root_node: &'static ConfigNode,
     pub command_output: String,
     pub need_redraw: bool,
 }
 
-impl<'a> UiState<'a> {
-    pub fn new(root_node: &'a ConfigNode) -> UiState<'a> {
+impl<'a> UiState {
+    pub fn new(root_node: &'static ConfigNode) -> UiState {
         let mut state = UiState {
             title: "",
             description: "",
@@ -34,7 +33,7 @@ impl<'a> UiState<'a> {
         state
     }
 
-    pub fn set_config_for_node(&mut self, node: &'a ConfigNode) {
+    pub fn set_config_for_node(&mut self, node: &'static ConfigNode) {
         self.title = &node.name;
         self.description = &node.description;
         self.current_node = node;
@@ -60,7 +59,7 @@ impl<'a> UiState<'a> {
         }
     }
 
-    pub fn get_selected_node(&self) -> Option<&'a ConfigNode> {
+    pub fn get_selected_node(&self) -> Option<&'static ConfigNode> {
         let selected_i = self.group_items_state.state.selected()?;
         Some(self.group_items.get(selected_i)?)
     }
@@ -94,7 +93,7 @@ impl<'a> UiState<'a> {
     }
 }
 
-impl<'a> fmt::Debug for UiState<'a> {
+impl<'a> fmt::Debug for UiState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("UiState")
             .field("title", &self.title)

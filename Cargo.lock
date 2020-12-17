@@ -120,6 +120,7 @@ name = "eddie"
 version = "0.1.0"
 dependencies = [
  "dirs",
+ "lazy_static",
  "pretty_assertions",
  "rand",
  "termion",
