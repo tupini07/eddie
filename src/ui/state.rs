@@ -42,13 +42,10 @@ impl<'a> UiState<'a> {
         if let Some(children) = &node.children {
             self.group_items = children.iter().collect();
 
-            let mut items_for_state = children
+            let items_for_state = children
                 .iter()
                 .map(|e| e.name.as_str())
                 .collect::<Vec<&str>>();
-
-            // sort elements of group alphabetically to make it nicer
-            items_for_state.sort_by_key(|e| e.to_lowercase());
 
             self.group_items_state = StatefulList::with_items(items_for_state);
 

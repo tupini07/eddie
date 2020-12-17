@@ -45,11 +45,14 @@ fn parse_nodes(val: &Value) -> ConfigNode {
     };
 
     let sub_tables = get_sub_table_keys(val);
-    let parsed_subtables: Vec<ConfigNode> = sub_tables
+    let mut parsed_subtables: Vec<ConfigNode> = sub_tables
         .unwrap_or_default()
         .iter()
         .map(|&e| parse_nodes(table.get(e).unwrap()))
         .collect();
+
+    // sorting here will ensure that all levels of the nodes are sorted
+    parsed_subtables.sort_by_key(|e| e.name.to_string());
 
     ConfigNode {
         name: name.to_string(),
@@ -73,13 +76,15 @@ pub fn read_config() -> AppConfig {
 
     let to_skip = vec!["ship"];
 
-    let top_level_children: Vec<ConfigNode> = root_table
+    let mut top_level_children: Vec<ConfigNode> = root_table
         .keys()
         .into_iter()
         .filter(|&e| !to_skip.contains(&e.as_str()))
         .filter_map(|e| root_table.get(e))
         .map(parse_nodes)
         .collect();
+
+    top_level_children.sort_by_key(|e| e.name.to_string());
 
     AppConfig {
         eddie_config: EddieConfig {},
