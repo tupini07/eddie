@@ -16,7 +16,9 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
             .map(|e| e.name.clone())
             .collect::<Vec<String>>()
             .join(" / ");
-        let paragraph = Paragraph::new(flat_bread.as_str()).block(block);
+        
+        let bc_text = format!("{} > {}", &crate::APP_CONFIG.eddie_config.ship_name, &flat_bread);
+        let paragraph = Paragraph::new(bc_text).block(block);
         frame.render_widget(paragraph, layout.breadcrumbs);
     }
 

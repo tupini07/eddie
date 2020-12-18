@@ -1,4 +1,4 @@
-use toml::Value;
+use toml::{value::Map, Value};
 
 use crate::config_reader::config_aggregator;
 use crate::config_reader::config_structs::*;
@@ -67,6 +67,19 @@ fn parse_nodes(val: &Value) -> ConfigNode {
     }
 }
 
+fn get_eddie_config(root_table: &Map<String, Value>) -> Option<EddieConfig> {
+    // check if we have the node for the root config
+    let ship_table = root_table.get("ship")?;
+
+    let get_att = |attr| Some(ship_table.get(attr)?.as_str()?.to_string());
+
+    Some(EddieConfig {
+        ship_name: get_att("name")?,
+        terminal_emulator: get_att("terminal_emulator")?,
+        terminal_emulator_command_arg: get_att("terminal_emulator_command_arg")?,
+    })
+}
+
 pub fn read_config() -> AppConfig {
     let toml_dir = config_aggregator::get_proper_config_directory();
     let content = config_aggregator::get_aggregated_tomls(toml_dir);
@@ -86,8 +99,17 @@ pub fn read_config() -> AppConfig {
 
     top_level_children.sort_by_key(|e| e.name.to_string());
 
+    let eddie_config = match get_eddie_config(root_table) {
+        Some(c) => c,
+        None => EddieConfig {
+            ship_name: String::from("Heart of Gold"),
+            terminal_emulator: String::from("alacritty"),
+            terminal_emulator_command_arg: String::from("--command"),
+        },
+    };
+
     AppConfig {
-        eddie_config: EddieConfig {},
+        eddie_config: eddie_config,
         config_tree: ConfigNode {
             name: "Root config node".to_string(),
             description: "This is the root node of the configuration tree".to_string(),

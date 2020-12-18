@@ -7,6 +7,9 @@ pub struct AppConfig {
 #[derive(Debug)]
 pub struct EddieConfig {
     // config for the actual execution of Eddie
+    pub ship_name: String,
+    pub terminal_emulator: String,
+    pub terminal_emulator_command_arg: String,
 }
 
 #[derive(Debug)]
