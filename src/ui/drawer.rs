@@ -85,8 +85,14 @@ pub fn draw_tui<B: Backend>(frame: &mut Frame<B>, layout: &BasicAppLayout, state
 
     {
         // Render Item description
+        let node_type = if state.get_selected_node().unwrap().is_leaf() {
+            "Command"
+        } else {
+            "Group"
+        };
+
         let block = Block::default()
-            .title("Item description")
+            .title(format!("Item description (Type: {})", node_type))
             .borders(Borders::ALL);
         let paragraph = Paragraph::new(state.description)
             .wrap(Wrap { trim: true })
