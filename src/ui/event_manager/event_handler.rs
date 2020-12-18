@@ -7,15 +7,15 @@ use crate::{config_reader::config_structs::ConfigNode, ui::state::UiState};
 
 fn execute_command(command_node: &ConfigNode) -> String {
     let mut command = Command::new(if command_node.opens_external {
-        "alacritty"
+        &crate::APP_CONFIG.eddie_config.terminal_emulator
     } else {
-        "fish"
+        &crate::APP_CONFIG.eddie_config.shell
     });
 
     if command_node.opens_external {
         command
-            .arg("--command")
-            .arg("fish")
+            .arg(&crate::APP_CONFIG.eddie_config.terminal_emulator_command_arg)
+            .arg(&crate::APP_CONFIG.eddie_config.shell)
             .arg("-c")
             .arg(&command_node.command)
     } else {
