@@ -10,6 +10,7 @@ pub struct EddieConfig {
     pub ship_name: String,
     pub terminal_emulator: String,
     pub terminal_emulator_command_arg: String,
+    pub shell: String,
 }
 
 #[derive(Debug)]

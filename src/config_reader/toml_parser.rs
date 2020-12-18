@@ -77,6 +77,7 @@ fn get_eddie_config(root_table: &Map<String, Value>) -> Option<EddieConfig> {
         ship_name: get_att("name")?,
         terminal_emulator: get_att("terminal_emulator")?,
         terminal_emulator_command_arg: get_att("terminal_emulator_command_arg")?,
+        shell: get_att("shell")?,
     })
 }
 
@@ -105,6 +106,7 @@ pub fn read_config() -> AppConfig {
             ship_name: String::from("Heart of Gold"),
             terminal_emulator: String::from("alacritty"),
             terminal_emulator_command_arg: String::from("--command"),
+            shell: String::from("bash"),
         },
     };
 
