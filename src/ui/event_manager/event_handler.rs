@@ -28,9 +28,14 @@ fn execute_command(command_node: &ConfigNode) -> String {
         .spawn()
         .expect("failed to execute process");
 
-    match child.wait_with_output() {
-        Ok(o) => String::from_utf8(o.stdout).unwrap(),
-        Err(_) => "There was an error while decoding the command's output!".to_string(),
+    // if the process opens an external terminal then don't wait for output
+    if command_node.opens_external {
+        return String::from("Executing command in external terminal...");
+    } else {
+        match child.wait_with_output() {
+            Ok(o) => String::from_utf8(o.stdout).unwrap(),
+            Err(_) => "There was an error while decoding the command's output!".to_string(),
+        }
     }
 }
 
