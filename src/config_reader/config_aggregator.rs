@@ -65,7 +65,7 @@ fn read_file_contents(file_path: &PathBuf) -> String {
     fs::read_to_string(file_path).expect("Something went wrong when reading the file")
 }
 
-/// This method will read all of the toml files in Eddie's config directory (see 
+/// This method will read all of the toml files in Eddie's config directory (see
 /// [get_proper_config_directory]) and return a huge string which is the aggregated content
 /// of all of these files.
 pub fn get_aggregated_tomls(ddir: PathBuf) -> String {
@@ -106,7 +106,7 @@ mod tests {
             create_dir(&test_dir).unwrap();
         }
 
-        use std::fs::{create_dir, File};
+        use std::fs::create_dir;
 
         let sub_folders = vec!["", "subf", "subf/sub1_2", "subf2"];
 

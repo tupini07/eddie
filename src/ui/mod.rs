@@ -1,7 +1,6 @@
 use std::{error::Error, io};
 
-use termion::{input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{backend::TermionBackend, Terminal};
+use tui::{backend::CrosstermBackend, Terminal};
 
 use util::event::Events;
 
@@ -16,10 +15,8 @@ mod util;
 
 pub fn show_ui(mut state: UiState) -> Result<(), Box<dyn Error>> {
     // Terminal initialization
-    let stdout = io::stdout().into_raw_mode()?;
-    let stdout = MouseTerminal::from(stdout);
-    let stdout = AlternateScreen::from(stdout);
-    let backend = TermionBackend::new(stdout);
+    let stdout = io::stdout();
+    let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
     let events = Events::new();

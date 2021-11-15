@@ -1,6 +1,7 @@
+use std::fmt::format;
 use std::process::{Command, Stdio};
 
-use termion::event::Key;
+use crossterm::event::KeyCode;
 
 use crate::ui::util::event::Event;
 use crate::{config_reader::config_structs::ConfigNode, ui::state::UiState};
@@ -26,7 +27,10 @@ fn execute_command(command_node: &ConfigNode) -> String {
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .expect("failed to execute process");
+        .expect(&format!(
+            "failed to execute process. Command: {:?}",
+            command
+        ));
 
     // if the process opens an external terminal then don't wait for output
     if command_node.opens_external {
@@ -39,25 +43,25 @@ fn execute_command(command_node: &ConfigNode) -> String {
     }
 }
 
-pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {
+pub fn handle_event(ev: Event<KeyCode>, state: &mut UiState) -> Option<bool> {
     match ev {
         Event::Input(input) => match input {
-            Key::Char('q') => {
+            KeyCode::Char('q') => {
                 return Some(true);
             }
-            Key::Backspace => {
+            KeyCode::Backspace => {
                 // state.current_group_items_state.unselect();
                 state.exit_current_node();
             }
-            Key::Char('\t') => {
+            KeyCode::Tab => {
                 state.group_items_state.next();
                 state.update_description();
             }
-            Key::BackTab => {
+            KeyCode::BackTab => {
                 state.group_items_state.previous();
                 state.update_description();
             }
-            Key::Char('\n') => {
+            KeyCode::Enter => {
                 let selected_node = state.get_selected_node()?;
                 if selected_node.is_leaf() {
                     state.command_output = "".to_string();
@@ -71,7 +75,7 @@ pub fn handle_event(ev: Event<Key>, state: &mut UiState) -> Option<bool> {
                     state.enter_selected_node();
                 }
             }
-            Key::Esc => {
+            KeyCode::Esc => {
                 // this can be used to exit context menu like popup for input
                 // For input example see: https://github.com/fdehau/tui-rs/blob/master/examples/user_input.rs
             }
