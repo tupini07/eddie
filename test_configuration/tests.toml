@@ -1,0 +1,33 @@
+[tests]
+name = "Tests"
+description = """
+This group contains commands that can be used to test the functionality \
+of Eddie"""
+
+[tests.test_echo]
+name = "Test echo"
+description = "This is just a dummy command that echoes stuff"
+command = "fortune -a | cowsay"
+
+[tests.generator_test]
+name = "Generator test"
+description = "Tests with a generator stuffy"
+command = "for a in (seq 10); echo $a; sleep 0.5; end"
+
+[tests.external_generator_test]
+name = "External Generator test"
+description = "Tests with a generator stuffy but in an external terminal emulator"
+command = "for a in (seq 10); echo $a 'external'; sleep 0.5; end"
+external = true
+
+[tests.external_lazydocker]
+name = "External Lazydocker"
+description = "Executes the 'lazydocker' command in an external terminal"
+command = "lazydocker"
+external = true
+
+[tests.external_gui_app]
+name = "External GUI Application"
+description = "Executes the 'meld' GUI tool externally"
+command = "meld"
+external = true

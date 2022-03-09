@@ -1,0 +1,17 @@
+# Define the "work" group
+[work]
+name = "Work"
+description = """
+Just work stuff."""
+
+# Define a "general" group inside of "Work"
+[work.general]
+name = "General"
+description = """
+Contains general scripts that are used for work."""
+
+
+[work.general.echo_hi]
+name = "Say hi!"
+description = "This is just a dummy command that echoes hi"
+command = "echo Hi!!"

@@ -1,0 +1,5 @@
+[ship]
+name = "Goldar"
+terminal_emulator = "/usr/local/bin/alacritty"
+terminal_emulator_command_arg = "--command"
+shell = "bash"
