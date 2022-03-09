@@ -22,4 +22,7 @@ fn main() {
     let ui_state = UiState::new(&APP_CONFIG.config_tree);
 
     ui::show_ui(ui_state).unwrap();
+
+    // clear terminal when we exit
+    print!("{esc}c", esc = 27 as char);
 }
