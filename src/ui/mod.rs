@@ -28,6 +28,7 @@ fn create_group_layer(
     node: Rc<ConfigNode>,
     breadcrumbs: Vec<String>,
 ) -> impl IntoBoxedView {
+    // set breadcrumbs and group title
     let flat_bread: String = breadcrumbs
         .iter()
         .map(|e| e.clone())
@@ -37,11 +38,13 @@ fn create_group_layer(
     let breadcrumbs_text = TextView::new(format!("{} / {}", eddie_config.ship_name, flat_bread));
     let section_title = Dialog::around(TextView::new(&node.name));
 
+    // construct list of items in group
     let mut group_items = SelectView::new()
         .h_align(HAlign::Left)
         .align(Align::top_left())
         .autojump();
 
+    // need to save somewhere what the text of the first description is
     let mut first_description_text = String::new();
 
     if let Some(child_nodes) = &node.children {
@@ -57,36 +60,39 @@ fn create_group_layer(
     } else {
         unreachable!("When rendering a group this should always be a non-terminal node!");
     }
-    // let child_nodes = node
-    //     .children
-    //     .as_ref()
-    //     .expect("When rendering a group this should always be a non-terminal node!");
 
-    // for child_node in child_nodes {
-    //     group_items.add_item(&child_node.name, child_node);
-    // }
-
+    // what to do when we change the selected item
+    let description_view_name = format!("item_description_text-{}", node.name);
     let item_description_text = TextArea::new()
         .disabled()
         .content(first_description_text)
         // .content(get_description_for_node(&child_nodes.get(0).unwrap()))
-        .with_name("item_description_text");
+        .with_name(&description_view_name);
 
-    group_items.set_on_select(|s, child_node| {
-        s.call_on_name("item_description_text", |view: &mut TextArea| {
+    group_items.set_on_select(move |s, child_node| {
+        s.call_on_name(&description_view_name, |view: &mut TextArea| {
             view.set_content(get_description_for_node(child_node));
         });
     });
 
+    // what to do when we actually select an item
     group_items.set_on_submit(move |s, child_node: &Rc<ConfigNode>| {
-        let mut new_breadcrumbs = breadcrumbs.clone();
-        new_breadcrumbs.push(child_node.name.clone());
+        let is_selected_node_group = is_group_node(&child_node);
 
-        s.add_fullscreen_layer(create_group_layer(
-            Rc::clone(&eddie_config),
-            Rc::clone(child_node),
-            new_breadcrumbs,
-        ));
+        if is_selected_node_group {
+            // if the selected node is a group then create a new view for it
+            let mut new_breadcrumbs = breadcrumbs.clone();
+            new_breadcrumbs.push(child_node.name.clone());
+
+            s.add_fullscreen_layer(create_group_layer(
+                Rc::clone(&eddie_config),
+                Rc::clone(child_node),
+                new_breadcrumbs,
+            ));
+        } else {
+            // otherwise it means the selected node is a command, in which case we
+            // execute it
+        }
     });
 
     let command_output = Panel::new(
@@ -137,6 +143,50 @@ pub fn show_ui(app_config: AppConfig) {
     siv.add_fullscreen_layer(root_layer);
 
     siv.add_global_callback('q', |s| s.quit());
+
+    siv.add_global_callback('h', |s| {
+        let help_text = r#"
+This is some long form help text
+
+This should be embedded in the executable from an external
+file, so that it is easier to maintain.
+
+hopefully it is scrollable
+
+press BACKSPACE to close this window
+
+Do we display emojis? 🚀😅🤔🙂
+
+----------
+
+something else
+
+Lorem Ipsum is simply dummy text of the printing
+and typesetting industry. Lorem Ipsum has been 
+the industry's standard dummy text ever since the 
+1500s, when an unknown printer took a galley of 
+type and scrambled it to make a type specimen 
+book. It has survived not only five centuries, 
+but also the leap into electronic typesetting, remaining 
+essentially unchanged. It was popularised in the 
+1960s with the release of Letraset sheets 
+containing Lorem
+
+Lorem Ipsum is simply dummy text of the printing
+and typesetting industry. Lorem Ipsum has been 
+the industry's standard dummy text ever since the 
+1500s, when an unknown printer took a galley of 
+type and scrambled it to make a type specimen 
+book. It has survived not only five centuries, 
+but also the leap into electronic typesetting, remaining 
+essentially unchanged. It was popularised in the 
+1960s with the release of Letraset sheets 
+containing Lorem
+        "#;
+
+        s.add_layer(Dialog::around(TextView::new(help_text).scrollable()).title("Help"));
+    });
+
     siv.add_global_callback(Key::Backspace, |s| {
         // only pop screens if we're not at the very first screen
         if s.screen().len() > 1 {
