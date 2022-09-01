@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use toml::{value::Map, Value};
 
 use crate::config_reader::config_aggregator;
@@ -23,7 +25,7 @@ fn get_sub_table_keys(val: &Value) -> Option<Vec<&String>> {
     }
 }
 
-fn parse_nodes(val: &Value) -> ConfigNode {
+fn parse_nodes(val: &Value) -> Rc<ConfigNode> {
     let table = val.as_table().unwrap();
 
     let name = table.get("name").unwrap().as_str().unwrap();
@@ -45,7 +47,7 @@ fn parse_nodes(val: &Value) -> ConfigNode {
     };
 
     let sub_tables = get_sub_table_keys(val);
-    let mut parsed_subtables: Vec<ConfigNode> = sub_tables
+    let mut parsed_subtables: Vec<Rc<ConfigNode>> = sub_tables
         .unwrap_or_default()
         .iter()
         .map(|&e| parse_nodes(table.get(e).unwrap()))
@@ -54,7 +56,7 @@ fn parse_nodes(val: &Value) -> ConfigNode {
     // sorting here will ensure that all levels of the nodes are sorted
     parsed_subtables.sort_by_key(|e| e.name.to_string());
 
-    ConfigNode {
+    Rc::new(ConfigNode {
         name: name.to_string(),
         description: description.to_string(),
         command: command.to_string(),
@@ -64,7 +66,7 @@ fn parse_nodes(val: &Value) -> ConfigNode {
         } else {
             Some(parsed_subtables)
         },
-    }
+    })
 }
 
 fn get_eddie_config(root_table: &Map<String, Value>) -> Option<EddieConfig> {
@@ -90,7 +92,7 @@ pub fn read_config() -> AppConfig {
 
     let to_skip = vec!["ship"];
 
-    let mut top_level_children: Vec<ConfigNode> = root_table
+    let mut top_level_children: Vec<Rc<ConfigNode>> = root_table
         .keys()
         .into_iter()
         .filter(|&e| !to_skip.contains(&e.as_str()))
@@ -111,8 +113,8 @@ pub fn read_config() -> AppConfig {
     };
 
     AppConfig {
-        eddie_config: eddie_config,
-        config_tree: ConfigNode {
+        eddie_config: Rc::new(eddie_config),
+        config_tree: Rc::new(ConfigNode {
             name: "Root config node".to_string(),
             description: "This is the root node of the configuration tree".to_string(),
             command: "".to_string(),
@@ -122,6 +124,6 @@ pub fn read_config() -> AppConfig {
             } else {
                 None
             },
-        },
+        }),
     }
 }

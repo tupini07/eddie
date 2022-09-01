@@ -1,7 +1,9 @@
+use std::rc::Rc;
+
 #[derive(Debug)]
 pub struct AppConfig {
-    pub eddie_config: EddieConfig,
-    pub config_tree: ConfigNode,
+    pub eddie_config: Rc<EddieConfig>,
+    pub config_tree: Rc<ConfigNode>,
 }
 
 #[derive(Debug)]
@@ -20,12 +22,12 @@ pub struct ConfigNode {
     pub name: String,
     pub description: String,
     pub command: String,
-    pub children: Option<Vec<ConfigNode>>,
+    pub children: Option<Vec<Rc<ConfigNode>>>,
     pub opens_external: bool,
 }
 
 impl ConfigNode {
-    pub fn is_leaf(&self) -> bool {
+    pub fn _is_leaf(&self) -> bool {
         self.children.is_none()
     }
 
