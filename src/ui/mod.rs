@@ -3,10 +3,14 @@ use std::rc::Rc;
 use cursive::align::{Align, HAlign};
 use cursive::event::Key;
 use cursive::traits::*;
+use cursive::utils::span::IndexedSpanRefMut;
 use cursive::view::IntoBoxedView;
-use cursive::views::{Dialog, LinearLayout, Panel, SelectView, TextArea, TextView};
+use cursive::views::{Dialog, LinearLayout, NamedView, Panel, SelectView, TextArea, TextView};
+use tui::text::Text;
 
 use crate::config_reader::config_structs::{AppConfig, ConfigNode, EddieConfig};
+
+mod executor;
 
 fn is_group_node(node: &ConfigNode) -> bool {
     node.children.is_some()
@@ -23,57 +27,103 @@ fn get_description_for_node(node: &ConfigNode) -> String {
     format!("[Type: {}] {}", node_type, node_description)
 }
 
-fn create_group_layer(
-    eddie_config: Rc<EddieConfig>,
-    node: Rc<ConfigNode>,
-    breadcrumbs: Vec<String>,
-) -> impl IntoBoxedView {
-    // set breadcrumbs and group title
-    let flat_bread: String = breadcrumbs
+fn get_breadcrumbs(
+    eddie_config: &EddieConfig,
+    node: &ConfigNode,
+    current_crumbs: &Vec<String>,
+) -> TextView {
+    let flat_bread: String = current_crumbs
         .iter()
         .map(|e| e.clone())
         .collect::<Vec<String>>()
         .join(" / ");
 
-    let breadcrumbs_text = TextView::new(format!("{} / {}", eddie_config.ship_name, flat_bread));
-    let section_title = Dialog::around(TextView::new(&node.name));
+    TextView::new(format!("{} / {}", eddie_config.ship_name, flat_bread))
+}
 
-    // construct list of items in group
+fn get_section_title(node: &ConfigNode) -> Dialog {
+    Dialog::around(TextView::new(&node.name))
+}
+
+fn get_group_items(node: &ConfigNode) -> SelectView<Rc<ConfigNode>> {
     let mut group_items = SelectView::new()
         .h_align(HAlign::Left)
         .align(Align::top_left())
         .autojump();
 
-    // need to save somewhere what the text of the first description is
-    let mut first_description_text = String::new();
-
     if let Some(child_nodes) = &node.children {
-        let mut is_set = false;
         for child_node in child_nodes {
-            if !is_set {
-                first_description_text = get_description_for_node(&child_node);
-            }
-            is_set = true;
-
             group_items.add_item(&child_node.name, Rc::clone(child_node));
         }
     } else {
         unreachable!("When rendering a group this should always be a non-terminal node!");
     }
 
-    // what to do when we change the selected item
+    group_items
+}
+
+fn get_item_description(
+    node: &ConfigNode,
+    group_items: &SelectView<Rc<ConfigNode>>,
+) -> (String, Panel<NamedView<TextArea>>) {
     let description_view_name = format!("item_description_text-{}", node.name);
-    let item_description_text = TextArea::new()
+
+    let mut first_description_text = group_items
+        .get_item(0) // we know there is at least 1 item in the group, so this is safe to do
+        .unwrap()
+        .1
+        .description
+        .clone();
+
+    let item_text = TextArea::new()
         .disabled()
         .content(first_description_text)
-        // .content(get_description_for_node(&child_nodes.get(0).unwrap()))
         .with_name(&description_view_name);
 
+    let panel = Panel::new(item_text)
+        .title("Item description (Type: Group)")
+        .title_position(HAlign::Left);
+
+    (description_view_name, panel)
+}
+
+fn get_command_output(node: &ConfigNode) -> (String, Panel<NamedView<TextArea>>) {
+    let command_output_text_name = format!("command_output_text-{}", node.name);
+    let command_output_text = TextArea::new()
+        .disabled()
+        .content("")
+        .with_name(&command_output_text_name);
+
+    let command_output = Panel::new(command_output_text)
+        .title("Command outputs")
+        .title_position(HAlign::Left);
+
+    (command_output_text_name, command_output)
+}
+
+fn create_group_layer(
+    eddie_config: Rc<EddieConfig>,
+    node: Rc<ConfigNode>,
+    breadcrumbs: Vec<String>,
+) -> impl IntoBoxedView {
+    // set breadcrumbs and group title
+
+    let breadcrumbs_text = get_breadcrumbs(&eddie_config, &node, &breadcrumbs);
+    let section_title = get_section_title(&node);
+
+    // construct list of items in group
+    let mut group_items = get_group_items(&node);
+
+    let (description_view_name, item_description) = get_item_description(&node, &group_items);
+
+    // what to do when we change the selected item
     group_items.set_on_select(move |s, child_node| {
         s.call_on_name(&description_view_name, |view: &mut TextArea| {
             view.set_content(get_description_for_node(child_node));
         });
     });
+
+    let (command_output_text_name, command_output) = get_command_output(&node);
 
     // what to do when we actually select an item
     group_items.set_on_submit(move |s, child_node: &Rc<ConfigNode>| {
@@ -92,16 +142,12 @@ fn create_group_layer(
         } else {
             // otherwise it means the selected node is a command, in which case we
             // execute it
+            let output = executor::execute_command(&eddie_config, child_node);
+            s.call_on_name(&command_output_text_name, |view: &mut TextArea| {
+                view.set_content(output);
+            });
         }
     });
-
-    let command_output = Panel::new(
-        TextArea::new()
-            .content("Write description here...")
-            .disabled(),
-    )
-    .title("Command outputs")
-    .title_position(HAlign::Left);
 
     let middle_layout = LinearLayout::horizontal()
         .child(
@@ -112,10 +158,6 @@ fn create_group_layer(
         )
         .child(command_output.full_width())
         .full_width();
-
-    let item_description = Panel::new(item_description_text)
-        .title("Item description (Type: Group)")
-        .title_position(HAlign::Left);
 
     let help_text = TextView::new("TAB to select next / Shift + TAB to select previous / RETURN to select / BACKSPACE to go back");
 
